@@ -1,0 +1,136 @@
+
+<html>
+<head>
+
+
+	<script>
+  		const strRecSTART = "Start Capturing";
+  		const strRecSTOP  = "Stop Capturing";
+  	</script>
+
+
+
+</head>
+
+<body>
+<center>
+<TABLE border=0 width=100% height=100%><TR valign=middle height=90%><TD align=center>
+
+
+	<table border=2 width=800pt height=600pt><tr valing=middle><td align=center>
+
+		<div id="screenshot" style="text-align:center;">
+			<video autoplay></video>
+			<p />
+			<button class="captureBtn">Start Capturing</button>	<!-- "HARDCODE" How to replace it? -->
+		</div>
+
+	</td></tr></table>
+
+	<!--- Auto-Enable Video Streaming from webpage -->
+	<script>
+		const constraints = {
+		  video: true
+		};
+
+		const video = document.querySelector('video');
+
+		navigator.mediaDevices.getUserMedia(constraints).
+		  then((stream) => {video.srcObject = stream});
+	</script>
+	<!--- ENDOF Auto-Enable Video Streaming from webpage -->
+
+
+
+	<script>
+			function getFormattedTimeIMG() {
+				var today = new Date();
+				var y = today.getFullYear();
+				// JavaScript months are 0-based.
+				var m = today.getMonth() + 1;
+				var d = today.getDate();
+				var h = today.getHours();
+				var mi = today.getMinutes();
+				var s = today.getSeconds();
+				return y + "-" + m  + d + "-" + h + mi + s + ".png";
+			}
+			function takeASnap(){
+				const canvas = document.createElement('canvas'); // create a canvas
+				const ctx = canvas.getContext('2d'); // get its context
+				canvas.width = video.videoWidth; // set its size to the one of the video
+				canvas.height = video.videoHeight;
+				ctx.drawImage(video, 0,0); // the video
+				return new Promise((res, rej)=>{
+					canvas.toBlob(res, 'image/png'); // request a Blob from the canvas
+				});
+			}		
+			function download(blob){
+				// uses the <a download> to download a Blob
+				let a = document.createElement('a'); 
+				a.href = URL.createObjectURL(blob);
+				a.download = getFormattedTimeIMG();	//'screenshot_01.png';
+				document.body.appendChild(a);
+				a.click();
+			}
+	</script>
+
+	<script>
+			var timeOutVar;
+			const intervalTime = 1000; 
+			function myRegularCapturer() {
+				takeASnap().then(download);
+				/*
+				someBlob = takeASnap();
+				download(someBlob);	
+				*/
+				timeOutVar = setTimeout(arguments.callee, intervalTime);
+			}
+	</script>
+
+
+	<script>
+		const captureVideoButton =
+  		document.querySelector('#screenshot .captureBtn');
+
+  		//const canvas = document.createElement('canvas');
+
+		captureVideoButton.onclick = function() {
+			if (strRecSTART == captureVideoButton.textContent) {					
+				captureVideoButton.textContent = strRecSTOP;	//Button uses textContent. Input type use .value
+
+				//takeASnap().then(download);	
+				timeOutVar = setTimeout(myRegularCapturer(), intervalTime)	
+
+			}
+			else {
+				captureVideoButton.textContent = strRecSTART;
+
+				//video.pause();	//** This is to stop the webcam real-time capture effect on the frame	
+				clearTimeout(timeOutVar);		
+			}
+		};
+	</script>
+	<!--- ENDOF Click button to restrat saving images -->
+
+
+
+
+
+
+
+
+
+
+
+
+</TD></TR><TR height=10%><TD align=center>	   
+
+	<div align=center valign=bottom>	
+		AIA ST4 Face Recognition Team
+	</div>
+	
+</TD></TR></TABLE>
+</center>
+</body>
+
+</html>
